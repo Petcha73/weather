@@ -73,7 +73,13 @@ function Weather() {
   });
 
   useEffect(() => {
-    fetch("https://geolocation-db.com/json/")
+    //we get the location of the browser through this simple api
+    fetch("https://geolocation-db.com/json/", {
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setWeatherData((prev) => {
@@ -83,10 +89,18 @@ function Weather() {
             country: "FR", //data.country_code,
           };
         });
+
+        //we create a return with the retrieving data
         return `https://api.openweathermap.org/data/3.0/onecall?lat=48.7997&lon=2.1732&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
         // `https://api.openweathermap.org/data/3.0/onecall?lat=${data.latitude}&lon=${data.longitude}&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
       })
-      .then((url) => fetch(url))
+      .then((url) => fetch(url), {
+        mode: "cors",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+
       .then((response) => response.json())
       .then((data) => {
         setWeatherData((prev) => {
@@ -99,7 +113,8 @@ function Weather() {
             daily: data.daily,
           };
         });
-      });
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   return (
