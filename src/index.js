@@ -6,7 +6,9 @@ function DateAndTime(props) {
   return (
     <div className="date">
       <h1>{props.dayName + " " + props.dayNum}</h1>
-      <p>Today in {props.city}</p>
+      <p>
+        Today in {props.city}, {props.country}
+      </p>
     </div>
   );
 }
@@ -23,8 +25,8 @@ function Icon(props) {
 function Temp(props) {
   return (
     <div className="temp">
-      <h1>{props.temp?.toFixed(1)}°</h1>
-      <p>Feels like {props.feels_like?.toFixed(1)}°</p>
+      <h1>{props.temp}°</h1>
+      <p>Feels like {props.feels_like}°</p>
     </div>
   );
 }
@@ -56,76 +58,26 @@ function Day(props) {
     <div className="day">
       <p>{dayName[props.dayCount]}</p>
       <img src={url} alt="icon" />
-      <p>{props.details.temp.day?.toFixed(1)}°</p>
+      <p>{props.details.temp.day}°</p>
     </div>
   );
 }
 
 function Weather() {
   const today = new Date();
-  const [ready, setReady] = useState(false);
 
   const [weatherData, setWeatherData] = useState({
     dayName: today.toString().slice(0, 3),
     dayNum: today.getDate().toString(),
     dayCount: today.getDay(),
-    city: "your place.",
+    city: "Paris",
+    country: "FR",
   });
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        let url = `https://api.openweathermap.org/data/3.0/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
+    let parisUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=48.866667&lon=2.333333&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
 
-        fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            setWeatherData((prev) => {
-              return {
-                ...prev,
-                temp: data.current.temp,
-                feels_like: data.current.feels_like,
-                description: data.current.weather[0].description,
-                mainIconUrl: `http://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`,
-                daily: data.daily,
-              };
-            });
-            setReady(true);
-          })
-          .catch((error) => console.log(error));
-      });
-    } else {
-      console.log("Geolocation is not supported by this browser.");
-    }
-
-    //we get the location of the browser through this simple api
-    /*
-    fetch("https://geolocation-db.com/json/", {
-      mode: "cors",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setWeatherData((prev) => {
-          return {
-            ...prev,
-            city: "Viroflay", //data.city,
-            country: "FR", //data.country_code,
-          };
-        });
-
-        //we create a return with the retrieving data
-        return `https://api.openweathermap.org/data/3.0/onecall?lat=48.7997&lon=2.1732&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
-        // `https://api.openweathermap.org/data/3.0/onecall?lat=${data.latitude}&lon=${data.longitude}&units=metric&exclude=minutely,hourly&appid=471ff7a7c3ee11573ac813188eb5fb37`;
-      })
-      .then((url) => fetch(url), {
-        mode: "cors",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      })
+    fetch(parisUrl)
       .then((response) => response.json())
       .then((data) => {
         setWeatherData((prev) => {
@@ -139,35 +91,27 @@ function Weather() {
           };
         });
       })
-      .catch((error) => console.log(error));
-      */
+      .catch((err) => console.log(err));
   }, []);
 
   return (
-    <>
-      {!ready && (
-        <p>
-          We need acces to your Geolocation to provide the weather data, thanks
-        </p>
-      )}
-      {ready && (
-        <div className="weather">
-          <div className="widgets">
-            <DateAndTime
-              city={weatherData.city}
-              dayName={weatherData.dayName}
-              dayNum={weatherData.dayNum}
-            />
-            <Icon
-              description={weatherData.description}
-              mainIconUrl={weatherData.mainIconUrl}
-            />
-            <Temp temp={weatherData.temp} feels_like={weatherData.feels_like} />
-          </div>
-          <Days daily={weatherData.daily} dayCount={weatherData.dayCount} />
-        </div>
-      )}
-    </>
+    <div className="weather">
+      <div className="widgets">
+        <DateAndTime
+          city={weatherData.city}
+          country={weatherData.country}
+          dayName={weatherData.dayName}
+          dayNum={weatherData.dayNum}
+        />
+        <Icon
+          description={weatherData.description}
+          mainIconUrl={weatherData.mainIconUrl}
+        />
+        <Temp temp={weatherData.temp} feels_like={weatherData.feels_like} />
+      </div>
+
+      <Days daily={weatherData.daily} dayCount={weatherData.dayCount} />
+    </div>
   );
 }
 
