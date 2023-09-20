@@ -25,8 +25,8 @@ function Icon(props) {
 function Temp(props) {
   return (
     <div className="temp">
-      <h1>{props.temp}°</h1>
-      <p>Feels like {props.feels_like}°</p>
+      <h1>{props.temp?.toFixed(1)}°</h1>
+      <p>Feels like {props.feels_like?.toFixed(1)}°</p>
     </div>
   );
 }
@@ -58,7 +58,7 @@ function Day(props) {
     <div className="day">
       <p>{dayName[props.dayCount]}</p>
       <img src={url} alt="icon" />
-      <p>{props.details.temp.day}°</p>
+      <p>{props.details.temp.day?.toFixed(1)}°</p>
     </div>
   );
 }
@@ -97,20 +97,21 @@ function Weather() {
   return (
     <div className="weather">
       <div className="widgets">
-        <DateAndTime
-          city={weatherData.city}
-          country={weatherData.country}
-          dayName={weatherData.dayName}
-          dayNum={weatherData.dayNum}
-        />
+        <Temp temp={weatherData.temp} feels_like={weatherData.feels_like} />
+
         <Icon
           description={weatherData.description}
           mainIconUrl={weatherData.mainIconUrl}
         />
-        <Temp temp={weatherData.temp} feels_like={weatherData.feels_like} />
       </div>
 
       <Days daily={weatherData.daily} dayCount={weatherData.dayCount} />
+      <DateAndTime
+        city={weatherData.city}
+        country={weatherData.country}
+        dayName={weatherData.dayName}
+        dayNum={weatherData.dayNum}
+      />
     </div>
   );
 }
